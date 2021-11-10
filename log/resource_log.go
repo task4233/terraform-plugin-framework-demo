@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/task4233/note-v2-terraform/client"
+	"github.com/task4233/terraform-plugin-framework-demo/client"
 )
 
 type resourceLogType struct{}

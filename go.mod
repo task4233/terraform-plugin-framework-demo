@@ -1,4 +1,4 @@
-module github.com/task4233/note-v2-terraform
+module github.com/task4233/terraform-plugin-framework-demo
 
 go 1.17
 

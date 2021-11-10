@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/task4233/note-v2-terraform/log"
+	"github.com/task4233/terraform-plugin-framework-demo/log"
 )
 
 func main() {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/task4233/note-v2-terraform/client"
+	"github.com/task4233/terraform-plugin-framework-demo/client"
 )
 
 const (
