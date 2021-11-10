@@ -2,7 +2,7 @@
 This is an unofficial demo for [Terraform-Plugin-Framework](https://www.terraform.io/docs/plugin/framework/) which is a new SDK under active development.
 Further information might be in [Official GitHub Repository](https://github.com/hashicorp/terraform-plugin-framework).
 
-## How to use
+## How to Use
 1. install plugin locally
 
 ```bash
@@ -13,6 +13,7 @@ $ make install
 
 ```bash
 cd examples
+rm -rf terraform.*
 terraform init
 ```
 
@@ -37,3 +38,9 @@ echo "edit configuration in main.tf"
 vim main.tf
 terraform apply
 ```
+
+## Useful Information
+- [Plugin Development](https://www.terraform.io/docs/extend/index.html)
+- [Implement Create and Read with the Terraform Plugin Framework](https://learn.hashicorp.com/tutorials/terraform/plugin-framework-create)
+- [terraform-provider-hashicups-pf](https://github.com/hashicorp/terraform-provider-hashicups-pf)
+- [hashicups-client-go](https://github.com/hashicorp-demoapp/hashicups-client-go)
