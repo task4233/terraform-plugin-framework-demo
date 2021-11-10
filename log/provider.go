@@ -31,7 +31,6 @@ func (p *provider) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 	}, nil
 }
 
-// .tfファイルに書かれている情報
 type providerData struct {
 	Host types.String `tfsdk:"host"`
 }
@@ -55,6 +54,7 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 			"Unable to create client",
 			err.Error(),
 		)
+		return
 	}
 	p.client = c
 	p.configured = true

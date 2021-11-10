@@ -17,10 +17,6 @@ type resourceLogType struct{}
 func (r resourceLogType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
-			"id": {
-				Type:     types.StringType,
-				Computed: true,
-			},
 			"items": {
 				Required: true,
 				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
@@ -54,7 +50,6 @@ func (r resourceLogType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk
 }
 
 func (r resourceLog) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
-	// create前のStateと後のStateを一緒にしないとバグる
 	if !r.p.configured {
 		resp.Diagnostics.AddError(
 			"Provider not configured",
@@ -97,6 +92,7 @@ func (r resourceLog) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 			"Error creating log",
 			fmt.Sprintf("Could not create log: %s", err.Error()),
 		)
+		return
 	}
 
 	gotItems := make([]OrderItem, len(gotLogs.Items))
@@ -111,7 +107,6 @@ func (r resourceLog) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	}
 
 	result := Order{
-		ID:          types.String{Value: "0"}, // set 0 for now
 		Items:       gotItems,
 		LastUpdated: types.String{Value: string(time.Now().Format(time.RFC850))},
 	}
@@ -181,8 +176,7 @@ func (r resourceLog) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 		}
 	}
 
-	orderID := state.ID.Value
-	order, err := r.p.client.UpdateLog(ctx, orderID, &client.Order{
+	order, err := r.p.client.UpdateLog(ctx, &client.Order{
 		Items: items,
 	})
 	if err != nil {
@@ -205,7 +199,6 @@ func (r resourceLog) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	}
 
 	var result = Order{
-		ID:          types.String{Value: orderID},
 		Items:       lis,
 		LastUpdated: types.String{Value: string(time.Now().Format(time.RFC850))},
 	}
@@ -221,8 +214,10 @@ func (r resourceLog) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 
 func (r resourceLog) Delete(context.Context, tfsdk.DeleteResourceRequest, *tfsdk.DeleteResourceResponse) {
 	fmt.Fprintf(os.Stderr, "[Delete]\n")
+	panic("not implemented")
 }
 
 func (r resourceLog) ImportState(context.Context, tfsdk.ImportResourceStateRequest, *tfsdk.ImportResourceStateResponse) {
 	fmt.Fprintf(os.Stderr, "[ImportState]\n")
+	panic("not implemented")
 }
