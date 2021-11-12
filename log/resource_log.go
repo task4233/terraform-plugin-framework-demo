@@ -216,5 +216,6 @@ func (r resourceLog) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 }
 
 func (r resourceLog) ImportState(context.Context, tfsdk.ImportResourceStateRequest, *tfsdk.ImportResourceStateResponse) {
+	// TODO: no need to implement for now
 	panic("not implemented")
 }
