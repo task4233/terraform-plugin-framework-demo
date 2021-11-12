@@ -39,6 +39,12 @@ vim main.tf
 terraform apply
 ```
 
+6. terraform destroy(Delete)
+
+```bash
+terraform destroy
+```
+
 ## Useful Information
 - [Plugin Development](https://www.terraform.io/docs/extend/index.html)
 - [Implement Create and Read with the Terraform Plugin Framework](https://learn.hashicorp.com/tutorials/terraform/plugin-framework-create)
