@@ -1,6 +1,6 @@
 ## Terraform-Plugin-Framework-Demo
 This is an unofficial demo for [Terraform-Plugin-Framework](https://www.terraform.io/docs/plugin/framework/) which is a new SDK under active development.
-Further information might be in [Official GitHub Repository](https://github.com/hashicorp/terraform-plugin-framework).
+Further information might be able to get in [Official GitHub Repository](https://github.com/hashicorp/terraform-plugin-framework).
 
 ## How to Use
 1. install plugin locally
@@ -20,8 +20,9 @@ terraform init
 3. terraform apply(Create)
 
 ```bash
-echo "running demo server for applying"
+echo "running demo server for serving data"
 go run ../demo-server/main.go
+echo "invoke `terraform apply` on another shell"
 terraform apply
 ```
 
