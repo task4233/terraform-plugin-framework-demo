@@ -18,11 +18,6 @@ resource "log_order" "item" {
         body = "hoge"
       }
     },
-    {
-      log = {
-        body = "piyo"
-      }
-    },
   ]
 }
 

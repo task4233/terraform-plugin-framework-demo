@@ -3,7 +3,6 @@ package log
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -58,7 +57,6 @@ func (r resourceLog) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 		return
 	}
 
-	// Retrieve values from plan
 	var plan Order
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -66,27 +64,19 @@ func (r resourceLog) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 		return
 	}
 
-	items := make([]client.OrderItem, len(plan.Items))
-	{
-		idx := 0
-		for _, item := range plan.Items {
-			if item.Log.Body.Null || item.Log.Body.Unknown {
-				continue
-			}
-			items[idx] = client.OrderItem{
-				Log: client.Log{
-					Body: item.Log.Body.Value,
-				},
-			}
-			idx++
+	items := make([]client.OrderItem, 0, len(plan.Items))
+	for _, item := range plan.Items {
+		if item.Log.Body.Null || item.Log.Body.Unknown {
+			continue
 		}
+		items = append(items, client.OrderItem{
+			Log: client.Log{
+				Body: item.Log.Body.Value,
+			},
+		})
 	}
 
-	log := client.Order{
-		Items: items,
-	}
-
-	gotLogs, err := r.p.client.CreateLog(ctx, &log)
+	gotLogs, err := r.p.client.CreateLog(ctx, &client.Order{Items: items})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating log",
@@ -95,23 +85,21 @@ func (r resourceLog) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 		return
 	}
 
-	gotItems := make([]OrderItem, len(gotLogs.Items))
-	for idx, item := range gotLogs.Items {
-		gotItems[idx] = OrderItem{
+	gotItems := make([]OrderItem, 0, len(gotLogs.Items))
+	for _, item := range gotLogs.Items {
+		gotItems = append(gotItems, OrderItem{
 			Log: Log{
 				Body: types.String{
 					Value: item.Log.Body,
 				},
 			},
-		}
+		})
 	}
 
-	result := Order{
+	diags = resp.State.Set(ctx, Order{
 		Items:       gotItems,
 		LastUpdated: types.String{Value: string(time.Now().Format(time.RFC850))},
-	}
-
-	diags = resp.State.Set(ctx, result)
+	})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -123,16 +111,16 @@ func (r resourceLog) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 
-	// orderID := state.ID.Value
 	order, err := r.p.client.GetLogs(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Failed reading order",
 			fmt.Sprintf("Failed client.GetLog: %s", err.Error()),
 		)
+		return
 	}
 
-	state.Items = []OrderItem{}
+	state.Items = make([]OrderItem, 0, len(order.Items))
 	for _, item := range order.Items {
 		state.Items = append(state.Items, OrderItem{
 			Log: Log{
@@ -148,8 +136,6 @@ func (r resourceLog) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	fmt.Fprintf(os.Stderr, "[Read]\n")
 }
 
 func (r resourceLog) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
@@ -167,18 +153,16 @@ func (r resourceLog) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 		return
 	}
 
-	items := make([]client.OrderItem, len(plan.Items))
-	for idx := range plan.Items {
-		items[idx] = client.OrderItem{
+	items := make([]client.OrderItem, 0, len(plan.Items))
+	for _, item := range plan.Items {
+		items = append(items, client.OrderItem{
 			Log: client.Log{
-				Body: plan.Items[idx].Log.Body.Value,
+				Body: item.Log.Body.Value,
 			},
-		}
+		})
 	}
 
-	order, err := r.p.client.UpdateLog(ctx, &client.Order{
-		Items: items,
-	})
+	updatedOrder, err := r.p.client.UpdateLog(ctx, &client.Order{Items: items})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error update order",
@@ -187,37 +171,50 @@ func (r resourceLog) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 		return
 	}
 
-	lis := make([]OrderItem, len(order.Items))
-	for idx := range order.Items {
-		lis[idx] = OrderItem{
+	gotItems := make([]OrderItem, 0, len(updatedOrder.Items))
+	for _, item := range updatedOrder.Items {
+		gotItems = append(gotItems, OrderItem{
 			Log: Log{
 				Body: types.String{
-					Value: order.Items[idx].Log.Body,
+					Value: item.Log.Body,
 				},
 			},
-		}
+		})
 	}
 
-	var result = Order{
-		Items:       lis,
+	diags = resp.State.Set(ctx, Order{
+		Items:       gotItems,
 		LastUpdated: types.String{Value: string(time.Now().Format(time.RFC850))},
+	})
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+}
 
-	diags = resp.State.Set(ctx, &result)
+func (r resourceLog) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+	var state Order
+	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	fmt.Fprintf(os.Stderr, "[Update]\n")
-}
+	if err := r.p.client.DeleteLog(ctx); err != nil {
+		resp.Diagnostics.AddError(
+			"Error delete order",
+			fmt.Sprintf("Could not delete: %s", err.Error()),
+		)
+		return
+	}
 
-func (r resourceLog) Delete(context.Context, tfsdk.DeleteResourceRequest, *tfsdk.DeleteResourceResponse) {
-	fmt.Fprintf(os.Stderr, "[Delete]\n")
-	panic("not implemented")
+	resp.State.RemoveResource(ctx)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 }
 
 func (r resourceLog) ImportState(context.Context, tfsdk.ImportResourceStateRequest, *tfsdk.ImportResourceStateResponse) {
-	fmt.Fprintf(os.Stderr, "[ImportState]\n")
 	panic("not implemented")
 }
