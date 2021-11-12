@@ -17,6 +17,9 @@ resource "log_order" "item" {
       log = {
         body = "hoge"
       }
+      log = {
+        body = "fuga"
+      }
     },
   ]
 }

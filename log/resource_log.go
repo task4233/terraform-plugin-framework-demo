@@ -48,6 +48,7 @@ func (r resourceLogType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk
 	}, nil
 }
 
+// Create is called when the user invokes `terraform apply` with completely new additional information in the ".tf" file
 func (r resourceLog) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
 	if !r.p.configured {
 		resp.Diagnostics.AddError(
@@ -106,6 +107,7 @@ func (r resourceLog) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	}
 }
 
+// Read is called when the user invokes `terraform apply` a second time or later
 func (r resourceLog) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
 	var state Order
 	diags := req.State.Get(ctx, &state)
@@ -138,6 +140,7 @@ func (r resourceLog) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 	}
 }
 
+// Update is called when the user invokes `terraform apply` with edited `.tf` file, whose changes include both partly added and deleted
 func (r resourceLog) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
 	var plan Order
 	diags := req.Plan.Get(ctx, &plan)
@@ -192,6 +195,7 @@ func (r resourceLog) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	}
 }
 
+// Delete is called when the user invokes `terraform destroy`
 func (r resourceLog) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
 	var state Order
 	diags := req.State.Get(ctx, &state)
