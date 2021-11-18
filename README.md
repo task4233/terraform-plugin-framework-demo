@@ -1,6 +1,6 @@
 ## Terraform-Plugin-Framework-Demo
 This is an unofficial demo for [Terraform-Plugin-Framework](https://www.terraform.io/docs/plugin/framework/) which is a new SDK under active development.
-Further information might be able to get in [Official GitHub Repository](https://github.com/hashicorp/terraform-plugin-framework).
+You might be able to get further information in [Official GitHub Repository](https://github.com/hashicorp/terraform-plugin-framework).
 
 ## How to Use
 1. install plugin locally
