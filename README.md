@@ -2,6 +2,9 @@
 This is an unofficial demo for [Terraform-Plugin-Framework](https://www.terraform.io/docs/plugin/framework/) which is a new SDK under active development.
 You might be able to get further information in [Official GitHub Repository](https://github.com/hashicorp/terraform-plugin-framework).
 
+※ This plugin needs Terraform CLI v1.0 or later.
+ref: [Terraform Plugin Framework](https://www.terraform.io/plugin/framework)
+
 ## How to Use
 1. install plugin locally
 
